@@ -1,0 +1,6 @@
+# build files
+*.exe
+*.o
+
+# IDE layout
+*.layout
