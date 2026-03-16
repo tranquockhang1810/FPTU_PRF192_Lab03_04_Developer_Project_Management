@@ -91,19 +91,58 @@ void findProjectByManager() {
 	}
 	if (!found) printf("No projects found for this Manager.\n");
 }
+void deleteProject() {
+	if (projectCount == 0) {
+		printf("\nNothing to delete.\n");
+		return;
+	}
+	char id[20];
+	printf("Enter Project ID to delete: ");
+	scanf("%s", id);
 
+	int index = findProjectById(id);
+	if (index == -1) {
+		printf("Error: Project ID not found!\n");
+		return;
+	}
+
+	for (int i = index; i < projectCount - 1; i++) {
+		projectList[i] = projectList[i + 1];
+	}
+	projectCount--;
+	printf("Project deleted successfully!\n");
+}
+void sortProjectsByBudget() {
+	if (projectCount < 2) {
+		printf("\nNot enough data to sort.\n");
+		return;
+	}
+
+	for (int i = 0; i < projectCount - 1; i++) {
+		for (int j = 0; j < projectCount - i - 1; j++) {
+			if (projectList[j].budget < projectList[j + 1].budget) {
+				Project temp = projectList[j];
+				projectList[j] = projectList[j + 1];
+				projectList[j + 1] = temp;
+			}
+		}
+	}
+	printf("\nSorted projects by Budget (Descending)!\n");
+}
 void projectMenu() {
 	int choice;
 	do {
-		printf("\n===== PROJECT MANAGEMENT =====\n");
+		printf("\n===== PROJECT  MANAGEMENT =====\n");
 		printf("1. Add New Project\n");
 		printf("2. Show All Projects\n");
 		printf("3. Find Projects by Manager ID\n");
+		printf("4. Delete Project by ID\n");
+		printf("5. Sort Projects by Budget (High to Low)\n");
 		printf("0. Back to Main Menu\n");
 		printf("Choose: ");
 		scanf("%d", &choice);
 
-		system("cls"); 
+		system("cls");
 
 		switch (choice) {
 			case 1:
@@ -114,6 +153,13 @@ void projectMenu() {
 				break;
 			case 3:
 				findProjectByManager();
+				break;
+			case 4:
+				deleteProject();
+				break;
+			case 5:
+				sortProjectsByBudget();
+				printProjectList();
 				break;
 			case 0:
 				break;
