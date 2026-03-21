@@ -94,30 +94,30 @@ int findDeveloperById(char id[]) {
 }
 
 void findDeveloperByName() {
-    char name[50];
-    int found = 0;
+	char name[50];
+	int found = 0;
 
-    printf("Find developer by name\n--------------------------\n");
-    printf("Enter developer name: ");
-    scanf(" %[^\n]", name);
+	printf("Find developer by name\n--------------------------\n");
+	printf("Enter developer name: ");
+	scanf(" %[^\n]", name);
 
-    if (developerCount == 0) {
-        printf("No developers available.\n");
-        return;
-    }
+	if (developerCount == 0) {
+		printf("No developers available.\n");
+		return;
+	}
 
-    printDeveloperTableHeader();
+	printDeveloperTableHeader();
 
-    for (int i = 0; i < developerCount; i++) {
-        if (strstr(developerList[i].name, name) != NULL) {
-            printDeveloperRow(developerList[i]);
-            found = 1;
-        }
-    }
+	for (int i = 0; i < developerCount; i++) {
+		if (strstr(developerList[i].name, name) != NULL) {
+			printDeveloperRow(developerList[i]);
+			found = 1;
+		}
+	}
 
-    if (!found) {
-        printf("No developer found with that name.\n");
-    }
+	if (!found) {
+		printf("No developer found with that name.\n");
+	}
 }
 
 void updateDeveloper() {
@@ -152,6 +152,49 @@ void updateDeveloper() {
 	printf("Developer updated successfully!\n");
 }
 
+void deleteDeveloper() {
+	char id[20];
+
+	printf("Delete developer\n--------------------------\n");
+
+	printf("Enter developer ID to delete: ");
+	scanf("%s", id);
+
+	int index = findDeveloperById(id);
+
+	if (index == -1) {
+		printf("Developer not found!\n");
+		return;
+	}
+
+	for (int i = index; i < developerCount - 1; i++) {
+		developerList[i] = developerList[i + 1];
+	}
+	developerCount--;
+
+	printf("Developer deleted successfully!\n");
+}
+
+void sortDeveloperByName() {
+	if (developerCount <= 1) {
+		printf("Not enough developers to sort.\n");
+		return;
+	}
+
+	for (int i = 0; i < developerCount - 1; i++) {
+		for (int j = i + 1; j < developerCount; j++) {
+			if (strcmp(developerList[i].name, developerList[j].name) > 0) {
+				Developer temp = developerList[i];
+				developerList[i] = developerList[j];
+				developerList[j] = temp;
+			}
+		}
+	}
+
+	printf("Developers sorted by Name successfully!\n");
+	printDeveloperList();
+}
+
 // demo function theo requirement
 void calculateTotalExperience() {
 	printf("Feature placeholder: calculateTotalExperience()\n");
@@ -170,7 +213,9 @@ void developerMenu() {
 		printf("2. Show Developer List\n");
 		printf("3. Update Developer\n");
 		printf("4. Find Developer By Name\n");
-		printf("5. Calculate Total Experience\n");
+		printf("5. Delete Developer\n");
+		printf("6. Sort Developer By Name\n");
+		printf("7. Calculate Total Experience\n");
 		printf("0. Back\n");
 		printf("Choose: ");
 		scanf("%d", &choice);
@@ -195,6 +240,14 @@ void developerMenu() {
 				break;
 
 			case 5:
+				deleteDeveloper();
+				break;
+
+			case 6:
+				sortDeveloperByName();
+				break;
+
+			case 7:
 				calculateTotalExperience();
 				break;
 
