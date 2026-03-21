@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 void developerMenu();
-//void projectMenu();
+void projectMenu();
 
 void mainMenu() {
     int choice;
@@ -21,7 +21,7 @@ void mainMenu() {
                 break;
 
             case 2:
-//                projectMenu();
+                projectMenu();
                 break;
 
             case 0:
