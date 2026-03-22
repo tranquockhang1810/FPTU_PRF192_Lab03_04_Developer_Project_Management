@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAX_DEVELOPERS 100
+#define DEVELOPER_FILE "database/developers.txt"
 
 // ============================
 // Struct
@@ -23,24 +25,81 @@ Developer developerList[MAX_DEVELOPERS];
 int developerCount = 0;
 
 // ============================
+// FILE HANDLING
+// ============================
+
+void saveDevelopersToFile() {
+	FILE *fp = fopen(DEVELOPER_FILE, "w");
+	if (fp == NULL) {
+		printf("Cannot open file to save data!\n");
+		return;
+	}
+
+	for (int i = 0; i < developerCount; i++) {
+		fprintf(fp, "%s|%s|%s|%s|%.2f\n",
+				developerList[i].id,
+				developerList[i].name,
+				developerList[i].birthDate,
+				developerList[i].programmingLanguages,
+				developerList[i].monthlySalary);
+	}
+
+	fclose(fp);
+}
+
+void loadDevelopersFromFile() {
+	FILE *fp = fopen(DEVELOPER_FILE, "r");
+	if (fp == NULL) {
+		return;
+	}
+
+	developerCount = 0;
+
+	while (!feof(fp)) {
+		Developer d;
+
+		if (fscanf(fp, "%[^|]|%[^|]|%[^|]|%[^|]|%f\n",
+				   d.id,
+				   d.name,
+				   d.birthDate,
+				   d.programmingLanguages,
+				   &d.monthlySalary) == 5) {
+
+			developerList[developerCount++] = d;
+		}
+	}
+
+	fclose(fp);
+}
+
+// ============================
 // Utility
 // ============================
 
 void printDeveloperTableHeader() {
 	printf("--------------------------------------------------------------------------\n");
 	printf("%-10s %-20s %-12s %-20s %-10s\n",
-	       "ID", "Name", "BirthDate", "Languages", "Salary");
+		   "ID", "Name", "BirthDate", "Languages", "Salary");
 	printf("--------------------------------------------------------------------------\n");
 }
 
 void printDeveloperRow(Developer d) {
 	printf("%-10s %-20s %-12s %-20s %-10.2f\n",
-	       d.id, d.name, d.birthDate, d.programmingLanguages, d.monthlySalary);
+		   d.id, d.name, d.birthDate, d.programmingLanguages, d.monthlySalary);
 }
 
 // ============================
 // Functions
 // ============================
+
+int findDeveloperById(char id[]) {
+	for (int i = 0; i < developerCount; i++) {
+		if (strcmp(developerList[i].id, id) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 void addDeveloper() {
 	if (developerCount >= MAX_DEVELOPERS) {
@@ -53,6 +112,11 @@ void addDeveloper() {
 
 	printf("Enter ID: ");
 	scanf("%s", d.id);
+
+	if (findDeveloperById(d.id) != -1) {
+		printf("Developer ID already exists!\n");
+		return;
+	}
 
 	printf("Enter name: ");
 	scanf(" %[^\n]", d.name);
@@ -67,6 +131,8 @@ void addDeveloper() {
 	scanf("%f", &d.monthlySalary);
 
 	developerList[developerCount++] = d;
+
+	saveDevelopersToFile();
 
 	printf("Developer added successfully!\n");
 }
@@ -84,15 +150,6 @@ void printDeveloperList() {
 	}
 }
 
-int findDeveloperById(char id[]) {
-	for (int i = 0; i < developerCount; i++) {
-		if (strcmp(developerList[i].id, id) == 0) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 void findDeveloperByName() {
 	char name[50];
 	int found = 0;
@@ -100,11 +157,6 @@ void findDeveloperByName() {
 	printf("Find developer by name\n--------------------------\n");
 	printf("Enter developer name: ");
 	scanf(" %[^\n]", name);
-
-	if (developerCount == 0) {
-		printf("No developers available.\n");
-		return;
-	}
 
 	printDeveloperTableHeader();
 
@@ -149,6 +201,8 @@ void updateDeveloper() {
 	printf("Enter new salary: ");
 	scanf("%f", &d->monthlySalary);
 
+	saveDevelopersToFile();
+
 	printf("Developer updated successfully!\n");
 }
 
@@ -170,7 +224,10 @@ void deleteDeveloper() {
 	for (int i = index; i < developerCount - 1; i++) {
 		developerList[i] = developerList[i + 1];
 	}
+
 	developerCount--;
+
+	saveDevelopersToFile();
 
 	printf("Developer deleted successfully!\n");
 }
@@ -191,13 +248,10 @@ void sortDeveloperByName() {
 		}
 	}
 
+	saveDevelopersToFile();
+
 	printf("Developers sorted by Name successfully!\n");
 	printDeveloperList();
-}
-
-// demo function theo requirement
-void calculateTotalExperience() {
-	printf("Feature placeholder: calculateTotalExperience()\n");
 }
 
 // ============================
@@ -207,6 +261,8 @@ void calculateTotalExperience() {
 void developerMenu() {
 	int choice;
 
+	loadDevelopersFromFile();
+
 	do {
 		printf("\n===== DEVELOPER MENU =====\n");
 		printf("1. Add Developer\n");
@@ -215,7 +271,6 @@ void developerMenu() {
 		printf("4. Find Developer By Name\n");
 		printf("5. Delete Developer\n");
 		printf("6. Sort Developer By Name\n");
-		printf("7. Calculate Total Experience\n");
 		printf("0. Back\n");
 		printf("Choose: ");
 		scanf("%d", &choice);
@@ -247,12 +302,7 @@ void developerMenu() {
 				sortDeveloperByName();
 				break;
 
-			case 7:
-				calculateTotalExperience();
-				break;
-
 			case 0:
-				printf("Back to main menu...\n");
 				break;
 
 			default:
