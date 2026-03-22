@@ -1,1 +1,2 @@
 001|PRF192 Asignment|001|2|InProgress|02/01/2026|C
+002|AI Chatbot Demo|002|3|Done|10/12/2024|C, JS

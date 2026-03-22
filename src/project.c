@@ -164,23 +164,25 @@ void printProjectList() {
 // Find by Developer
 // ============================
 
-void findProjectByDev() {
-    char devID[20];
+void findProjectByName() {
+    char name[100];
     int found = 0;
 
-    printf("Enter Developer ID: ");
-    scanf("%s", devID);
+    printf("Enter Project Name: ");
+    scanf(" %[^\n]", name);
 
     printProjectTableHeader();
 
     for (int i = 0; i < projectCount; i++) {
-        if (strcmp(projectList[i].dev, devID) == 0) {
+        if (strstr(projectList[i].name, name) != NULL) {
             printProjectRow(projectList[i]);
             found = 1;
         }
     }
 
-    if (!found) printf("No projects found.\n");
+    if (!found) {
+        printf("No projects found with that name.\n");
+    }
 }
 
 // ============================
@@ -255,20 +257,25 @@ void deleteProject() {
 // Sort
 // ============================
 
-void sortProjectsByDuration() {
+void sortProjectsByName() {
+    if (projectCount <= 1) {
+        printf("Not enough projects to sort.\n");
+        return;
+    }
+
     for (int i = 0; i < projectCount - 1; i++) {
-        for (int j = 0; j < projectCount - i - 1; j++) {
-            if (projectList[j].duration < projectList[j + 1].duration) {
-                Project temp = projectList[j];
-                projectList[j] = projectList[j + 1];
-                projectList[j + 1] = temp;
+        for (int j = i + 1; j < projectCount; j++) {
+            if (strcmp(projectList[i].name, projectList[j].name) > 0) {
+                Project temp = projectList[i];
+                projectList[i] = projectList[j];
+                projectList[j] = temp;
             }
         }
     }
 
     saveProjectsToFile();
 
-    printf("Sorted by Duration (Descending).\n");
+    printf("Sorted projects by Name successfully!\n");
     printProjectList();
 }
 
@@ -285,10 +292,10 @@ void projectMenu() {
         printf("\n===== PROJECT MANAGEMENT =====\n");
         printf("1. Add Project\n");
         printf("2. Show All Projects\n");
-        printf("3. Find by Developer\n");
+        printf("3. Find Project by Name\n");
         printf("4. Update Project\n");
         printf("5. Delete Project\n");
-        printf("6. Sort by Duration\n");
+        printf("6. Sort by Project Name\n");
         printf("0. Back\n");
         printf("Choose: ");
         scanf("%d", &choice);
@@ -303,7 +310,7 @@ void projectMenu() {
                 printProjectList();
                 break;
             case 3:
-                findProjectByDev();
+                findProjectByName();
                 break;
             case 4:
                 updateProject();
@@ -312,7 +319,7 @@ void projectMenu() {
                 deleteProject();
                 break;
             case 6:
-                sortProjectsByDuration();
+                sortProjectsByName();
                 break;
             case 0:
                 break;
